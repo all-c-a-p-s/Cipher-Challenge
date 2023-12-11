@@ -10,8 +10,6 @@ import (
 	"strings"
 )
 
-//!Not completely reliable, tends to work around 1 in 3 times on ciphertexts ~500 chars
-
 type key struct {
 	k     [26]byte
 	score int
@@ -97,46 +95,28 @@ func mutate(parent [26]byte) [26]byte {
 	return newKey
 }
 
-func acceptanceProbability(dE, temp float64) float64 {
-	return dE * temp
-}
-
-func simulatedAnnealing(maxConstant int, maxTemp int, ciphertext string, k float64) {
+func hillClimb(maxConstant int, ciphertext string) {
+	total := 0
 	alpha := key{randomise(), 0}
-	constant := 0
-	temp := float64(maxTemp)
-	for constant < maxConstant {
+	for i := 0; i < maxConstant; i++ {
+		total++
 		n := mutate(alpha.k)
 
 		p1 := encipher(alpha.k, ciphertext)
 		p2 := encipher(n, ciphertext)
-
-		s1 := 1
-		s2 := float64(score(p2)) / float64(score(p1))
-		deltaE := float64(s2 / float64(s1))
-		if deltaE >= 1 {
+		if score(p2) > score(p1) {
 			alpha.k = n
 			alpha.score = score(p2)
-			constant = 0
-		} else {
-			p := acceptanceProbability(deltaE, temp)
-			x := rand.Float64()
-			if x <= p {
-				alpha.k = n
-				alpha.score = score(p2)
-				constant = 0
-			} else {
-				constant++
-			}
+			i = 0
 		}
-		temp *= k
 	}
 	fmt.Println(encipher(alpha.k, ciphertext))
+	fmt.Println(total)
 }
 
 func main() {
 	original, err := os.ReadFile("ciphertext.txt")
 	check(err)
 	ciphertext := format(original)
-	simulatedAnnealing(100, 1, ciphertext, 0.95)
+	hillClimb(100, ciphertext)
 }
