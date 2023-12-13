@@ -23,7 +23,7 @@ func check(err error) {
 	}
 }
 
-func letterFrequencies() map[byte]float32 { //initialiser function
+func letterFrequencies() map[byte]float32 { // initialiser function
 	freq := map[byte]float32{
 		'A': 8.12,
 		'B': 1.49,
@@ -56,11 +56,10 @@ func letterFrequencies() map[byte]float32 { //initialiser function
 	return freq
 }
 
-func letters() []byte { //initialiser function
+func letters() []byte { // initialiser function
 	letters := []byte{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
 
 	return letters
-
 }
 
 func keyLength(ciphertext string) int {
@@ -69,7 +68,7 @@ func keyLength(ciphertext string) int {
 	var total int
 
 	for i := 1; i < len(ciphertext)/2; i++ {
-		c := 0 //coincidences on current shift
+		c := 0 // coincidences on current shift
 		for j := 0; j < len(ciphertext)-i; j++ {
 			if ciphertext[j+i] == ciphertext[j] {
 				c++
@@ -90,16 +89,16 @@ func keyLength(ciphertext string) int {
 
 	var bestLength int
 
-	for i := 1; i < len(highIndices); i++ { //where i is increment between steps
+	for i := 1; i < len(highIndices); i++ { // where i is increment between steps
 		currentTotal := 0
 		for j := 0; j < len(highIndices); j++ {
 			if j == len(highIndices)-1 {
 				break
 			}
-			if highIndices[j]+i == highIndices[j+1] { //uses modulo to check for multiples, doesn't matter if this is negative
+			if highIndices[j]+i == highIndices[j+1] { // uses modulo to check for multiples, doesn't matter if this is negative
 				currentTotal++
 			} else {
-				currentTotal-- //used so that factors of actual key don't get equal or higher total
+				currentTotal-- // used so that factors of actual key don't get equal or higher total
 			}
 		}
 		if currentTotal > bestLength {
@@ -112,8 +111,7 @@ func keyLength(ciphertext string) int {
 }
 
 func findKey(length int, ciphertext string) (key []int) {
-
-	for i := 0; i < length; i++ { //loop through characters shifted by various amounts
+	for i := 0; i < length; i++ { // loop through characters shifted by various amounts
 		bestShift := 0
 		var bestScore float32
 		for shift := 0; shift < 26; shift++ {
@@ -146,8 +144,7 @@ func findKey(length int, ciphertext string) (key []int) {
 				'Z': 0,
 			}
 			for j := i; j < len(ciphertext); j += length {
-
-				frequenciesFound[string(rune((int(ciphertext[j])-65+shift)%26) + 65)[0]]++ //convert to 0-25, then add shift and % 26, than add 65 back, then convert to byte by string[0]
+				frequenciesFound[string(rune((int(ciphertext[j])-65+shift)%26) + 65)[0]]++ // convert to 0-25, then add shift and % 26, than add 65 back, then convert to byte by string[0]
 			}
 			shiftScore := frequencyScore(frequenciesFound)
 			if shiftScore > bestScore {
@@ -161,7 +158,6 @@ func findKey(length int, ciphertext string) (key []int) {
 	}
 
 	return key
-
 }
 
 func frequencyScore(frequencies map[byte]int) float32 {
@@ -178,7 +174,6 @@ func frequencyScore(frequencies map[byte]int) float32 {
 }
 
 func decrypt(ciphertext string, key []int) (decrypted string) {
-
 	step := 0
 	for i := 0; i < len(ciphertext); i++ {
 		cipherLetterIndex := int(ciphertext[i]) - 65

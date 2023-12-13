@@ -119,6 +119,44 @@ func possibleRowLengths(factorisation []int) (uniqueFactors []int) {
 	return uniqueFactors
 }
 
+func print(b []byte, columnSize int) {
+	for i := 0; i < len(b); i++ {
+		if i%columnSize == 0 {
+			fmt.Println()
+		}
+		fmt.Print(string(b[i]))
+	}
+}
+
+func rotate(text []byte, columnSize int) []byte { // rotates by 90 degrees clockwise, can then be called however many times to get the right angle
+	var spaces string
+	l := len(text)
+	for l%columnSize != 0 {
+		spaces += " "
+		l++
+	}
+
+	b := []byte(string(text) + spaces)
+	fmt.Println(len(b))
+	columns := len(b) / columnSize
+
+	if len(b)%columnSize != 0 {
+		columns += 1
+	}
+	var res []byte
+	for i := 0; i < columnSize; i++ {
+		j := columnSize * (columns - 1)
+
+		for k := j + i; k >= 0; k -= columnSize { // column currently on
+			fmt.Println(k)
+			res = append(res, b[k])
+		}
+
+	}
+	fmt.Println(string(res))
+	return res
+}
+
 func tryKeyLength(ciphertext string, keyLength int) (decoded string) {
 	for i := 0; i < len(ciphertext)/keyLength; i++ {
 		for j := i; j < len(ciphertext); j += len(ciphertext) / keyLength {
@@ -131,6 +169,9 @@ func tryKeyLength(ciphertext string, keyLength int) (decoded string) {
 func decodePermutation(scrambled string, permutation []int) (result string) {
 	keyLength := len(permutation)
 	for i := 0; i < len(scrambled); i += keyLength {
+		if i+keyLength >= len(scrambled) {
+			break
+		}
 		slice := scrambled[i : i+keyLength]
 		for j := 0; j < len(permutation); j++ {
 			result += string(slice[permutation[j]])
@@ -139,12 +180,12 @@ func decodePermutation(scrambled string, permutation []int) (result string) {
 	return result
 }
 
-func mutate(parent []int) []int {
+func mutate(parent []int, n int) []int {
 	newKey := slices.Clone(parent)
-	i1 := rand.Intn(26)
-	i2 := rand.Intn(26)
+	i1 := rand.Intn(n)
+	i2 := rand.Intn(n)
 	for i2 == i1 {
-		i2 = rand.Intn(26) // keep generating random numbers until not equal to i1
+		i2 = rand.Intn(n) // keep generating random numbers until not equal to i1
 	}
 
 	newKey[i1], newKey[i2] = newKey[i2], newKey[i1]
@@ -156,7 +197,7 @@ func hillClimb(maxConstant int, n int, ciphertext string) {
 	alpha := key{randomise(n), 0}
 	for i := 0; i < maxConstant; i++ {
 		total++
-		p := mutate(alpha.k)
+		p := mutate(alpha.k, n)
 
 		p1 := decodePermutation(ciphertext, alpha.k)
 		p2 := decodePermutation(ciphertext, p)
@@ -164,12 +205,17 @@ func hillClimb(maxConstant int, n int, ciphertext string) {
 			alpha.k = p
 			alpha.score = score(p2)
 			i = 0
-		} else if p1 == p2 {
-			fmt.Println("wtrf")
 		}
 	}
 	fmt.Println(decodePermutation(ciphertext, alpha.k))
 	fmt.Println(total)
+}
+
+func reverse(s string) (rev string) {
+	for i := len(s) - 1; i >= 0; i-- {
+		rev += string(s[i])
+	}
+	return rev
 }
 
 func main() {
@@ -177,8 +223,7 @@ func main() {
 	check(err)
 	ciphertext := removeSpaces(string(original))
 	fmt.Println(factorise(len(ciphertext)))
-	decoded := tryKeyLength(ciphertext, 17) // change number here based on factorisation
+	//_ := tryKeyLength(ciphertext, 17) // change number here based on factorisation
 	// fmt.Println(decoded)
-
-	hillClimb(100, 34, decoded)
+	print(rotate([]byte("qwertyuio"), 5), 2)
 }
