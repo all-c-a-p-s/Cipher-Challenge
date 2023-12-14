@@ -137,6 +137,7 @@ func bruteForce(ciphertext string) {
 
 		plaintext := decipher(ciphertext, inverse(m))
 		if score(plaintext)*10 >= referenceScore*8 {
+			fmt.Println(m)
 			fmt.Println(plaintext)
 		}
 	}

@@ -36,7 +36,7 @@ func tetragrams() map[string]int {
 }
 
 func letters() []byte {
-	return []byte{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'} // remove J or Z as necessary
+	return []byte{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'} // remove J or Z as necessary
 }
 
 func format(original []byte) (result string) {
@@ -98,73 +98,99 @@ func fillGrid(keyword string) []byte {
 	for i := 0; i < len(unused); i++ {
 		grid = append(grid, unused[i])
 	}
+	grid = append(grid, ' ') // last null character, set this to space if you want to include space as a character
 	return grid
 }
 
-func gridIndex(row, column int) int {
-	return row*5 + column
+func coordinates(idx int) (grid, row, column int) {
+	grid = idx / 9
+	row = (idx - grid*9) / 3
+	column = idx - grid*9 - row*3
+	return grid, row, column
 }
 
-func rowAndColumn(grid int) (int, int) {
-	row := grid / 5
-	column := grid - row*5
-	return row, column
+func gridIndex(g, r, c int) int {
+	return 9*g + 3*r + c
 }
 
-func decipher(text, keyword string) (deciphered string) {
+func decipher(text, keyword string, n int) (deciphered string) {
 	grid := fillGrid(keyword)
-	for i := 0; i < len(text)-1; i += 2 {
-		var idx1, idx2 int
+	numBoxes := 1
+	if n != 0 {
+		numBoxes = len(text) / n // where a box is 3 rows of n digits
+		if len(text)%n != 0 {
+			numBoxes++
+		}
+	}
+	boxes := make([]string, numBoxes)
+	var idx int
+	var currentBox int
+	for i := 0; i < len(text); i++ {
+
 		for j := 0; j < len(grid); j++ {
-			if text[i] == grid[j] {
-				idx1 = j
-			} else if text[i+1] == grid[j] {
-				idx2 = j
+			if grid[j] == text[i] {
+				idx = j
 			}
 		}
-		row1, column1 := rowAndColumn(idx1)
-		row2, column2 := rowAndColumn(idx2)
-
-		var dRow1, dColumn1, dRow2, dColumn2 int
-
-		if row1 == row2 && column1 == column2 {
-			fmt.Println(i)
-			fmt.Println(string(text[len(deciphered)]), string(text[len(deciphered)+1]))
-			panic("Two letters on same grid square")
-		} else if row1 == row2 {
-			dRow1 = row1
-			dRow2 = row2
-			dColumn1 = (column1 - 1 + 5) % 5 // adding 5 bc negative mod doesn't work
-			dColumn2 = (column2 - 1 + 5) % 5
-		} else if column1 == column2 {
-			dColumn1 = column1
-			dColumn2 = column2
-			dRow1 = (row1 - 1 + 5) % 5
-			dRow2 = (row2 - 1 + 5) % 5
-		} else { // no same
-			dRow1 = row1
-			dRow2 = row2
-			dColumn1 = column2
-			dColumn2 = column1
+		g, r, c := coordinates(idx)
+		boxes[currentBox] += fmt.Sprintf("%d%d%d", g, r, c) // len of box is always a mutliple of 3 so this is fine
+		if len(boxes[currentBox]) == (3 * n) {              // current box filled
+			currentBox++
 		}
+	}
 
-		letter1 := grid[gridIndex(dRow1, dColumn1)]
-		letter2 := grid[gridIndex(dRow2, dColumn2)]
-		deciphered += string(letter1)
-		deciphered += string(letter2)
+	var row1, row2, row3 string
+	for _, box := range boxes {
+		row1 += box[:len(box)/3]
+		row2 += box[len(box)/3 : 2*len(box)/3]
+		row3 += box[2*len(box)/3:]
+	}
 
+	var unboxed []string // 10/10 variable name
+	for i := 0; i < len(row1); i++ {
+		concat := string(row1[i]) + string(row2[i]) + string(row3[i])
+		unboxed = append(unboxed, concat)
+	}
+
+	for _, u := range unboxed {
+		g, err := strconv.Atoi(string(u[0]))
+		check(err)
+		r, err := strconv.Atoi(string(u[1]))
+		check(err)
+		c, err := strconv.Atoi(string(u[2]))
+		check(err)
+		deciphered += string(grid[gridIndex(g, r, c)])
 	}
 	return deciphered
 }
 
 func dictionaryAttack(ciphertext string) {
-	dict := scanDict()
+	dict := scanDict()[:1000]
 	referenceScore := score(genReference(len(ciphertext)))
-	for i := 0; i < len(dict); i++ {
-		p := decipher(ciphertext, dict[i])
-		s := score(p)
-		if 10*s >= referenceScore*8 {
-			fmt.Println(p)
+	for n := 0; n < 20; n++ {
+		for i := 0; i < len(dict); i++ {
+			p := decipher(ciphertext, dict[i], n)
+			s := score(p)
+			if 10*s >= referenceScore*8 {
+				fmt.Println(p)
+			}
+		}
+	}
+}
+
+func wordListAttack(ciphertext string) { // words list generated from previous plaintexts of the challenge
+	w, err := os.ReadFile("../challenge_word_list.txt")
+	check(err)
+	f := strings.ToUpper(string(w))
+	words := strings.Fields(f)
+	referenceScore := score(genReference(len(ciphertext)))
+	for n := 0; n < 20; n++ {
+		for i := 0; i < len(words); i++ {
+			p := decipher(ciphertext, words[i], n)
+			s := score(p)
+			if 10*s >= referenceScore*8 {
+				fmt.Println(p)
+			}
 		}
 	}
 }
@@ -172,7 +198,7 @@ func dictionaryAttack(ciphertext string) {
 func main() {
 	original, err := os.ReadFile("ciphertext.txt")
 	check(err)
-
-	ciphertext := format(original)
-	dictionaryAttack(ciphertext)
+	// ciphertext := format(original)
+	dictionaryAttack(string(original))
+	wordListAttack(string(original))
 }

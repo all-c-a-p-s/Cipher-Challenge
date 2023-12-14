@@ -202,32 +202,32 @@ func graph() {
 		BarWidth: 30,
 		// paste output from print() into here lol
 		Bars: []chart.Value{
-			{Value: 0.052747, Label: "A"},
-			{Value: 0.044689, Label: "B"},
-			{Value: 0.063004, Label: "C"},
-			{Value: 0.048352, Label: "D"},
-			{Value: 0.044689, Label: "E"},
-			{Value: 0.043956, Label: "F"},
-			{Value: 0.043223, Label: "G"},
-			{Value: 0.021978, Label: "H"},
-			{Value: 0.052747, Label: "I"},
-			{Value: 0.046886, Label: "J"},
-			{Value: 0.047619, Label: "K"},
-			{Value: 0.036630, Label: "L"},
-			{Value: 0.034432, Label: "M"},
-			{Value: 0.033700, Label: "N"},
-			{Value: 0.032234, Label: "O"},
-			{Value: 0.029304, Label: "P"},
-			{Value: 0.021245, Label: "Q"},
-			{Value: 0.039560, Label: "R"},
-			{Value: 0.034432, Label: "S"},
-			{Value: 0.020513, Label: "T"},
-			{Value: 0.041758, Label: "U"},
-			{Value: 0.027106, Label: "V"},
-			{Value: 0.033700, Label: "W"},
-			{Value: 0.037363, Label: "X"},
-			{Value: 0.029304, Label: "Y"},
-			{Value: 0.038828, Label: "Z"},
+			{Value: 0.078197, Label: "A"},
+			{Value: 0.047378, Label: "B"},
+			{Value: 0.016099, Label: "C"},
+			{Value: 0.026679, Label: "D"},
+			{Value: 0.028519, Label: "E"},
+			{Value: 0.027599, Label: "F"},
+			{Value: 0.018629, Label: "G"},
+			{Value: 0.056808, Label: "H"},
+			{Value: 0.054738, Label: "I"},
+			{Value: 0.000000, Label: "J"},
+			{Value: 0.048988, Label: "K"},
+			{Value: 0.043928, Label: "L"},
+			{Value: 0.037489, Label: "M"},
+			{Value: 0.055658, Label: "N"},
+			{Value: 0.041168, Label: "O"},
+			{Value: 0.050598, Label: "P"},
+			{Value: 0.068077, Label: "Q"},
+			{Value: 0.026449, Label: "R"},
+			{Value: 0.064397, Label: "S"},
+			{Value: 0.044618, Label: "T"},
+			{Value: 0.018399, Label: "U"},
+			{Value: 0.034039, Label: "V"},
+			{Value: 0.048068, Label: "W"},
+			{Value: 0.024839, Label: "X"},
+			{Value: 0.019089, Label: "Y"},
+			{Value: 0.019549, Label: "Z"},
 			{Value: 0.000000, Label: "XAXIS"}, // in here so that the x-axis always starts at 0
 		},
 	}
@@ -298,6 +298,7 @@ func print(m map[byte]int) {
 func main() { // uncomment whatever you want here
 	_, formatted := read()
 	// bin := formatBinary(unformatted)
+	fmt.Printf("Length: %d \n", len(formatted))
 	fmt.Printf("IOC: %f \n", randomIOC(formatted))
 	fmt.Println("Shift IOCs: ", shiftIOC(8, formatted))
 	// fmt.Println("UNFORMATTED: ")
