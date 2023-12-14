@@ -56,7 +56,7 @@ func scanDict() (words []string) {
 	dict, err := os.Open("../google-10000-english.txt")
 	check(err)
 
-	words = append(words, "polybius") // worth a try lol
+	words = append(words, "POLYBIUS") // worth a try lol
 
 	scanner := bufio.NewScanner(dict)
 	for scanner.Scan() {
@@ -189,7 +189,7 @@ func convertFromPolybius(nums []int) (res string) {
 
 func dictionaryAttack(ciphertext string) {
 	dict := scanDict()
-	referenceScore := score(genReference(len(ciphertext) / 2)) // divided by 2 because 2 digits correspond to one number
+	referenceScore := score(genReference(len(ciphertext) / 2)) // divided by 2 because 2 digits correspond to one letter
 	fmt.Println(referenceScore)
 	for i := 0; i < len(dict); i++ {
 		p := decipher(ciphertext, dict[i])

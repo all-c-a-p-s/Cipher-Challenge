@@ -52,9 +52,6 @@ func scanDict() (words []string) {
 	dict, err := os.Open("../google-10000-english.txt")
 	check(err)
 
-	words = append(words, "POLYBIUS") // worth a try lol
-	words = append(words, "PLAYFAIR")
-
 	scanner := bufio.NewScanner(dict)
 	for scanner.Scan() {
 		words = append(words, strings.ToUpper(scanner.Text()))
@@ -83,54 +80,82 @@ func genReference(l int) (ref string) { // generates reference text
 	return ref
 }
 
-func fillGrid(keyword string) []byte {
+func fillGridVH(keyword1, keyword2 string) []byte { // fills two vertical grids horizontally
 	unused := letters()
-	var grid []byte
-	for i := 0; i < len(keyword); i++ {
-		l := keyword[i]
+	var grid1, grid2, grid []byte
+	for i := 0; i < len(keyword1); i++ {
+		l := keyword1[i]
 		for j := 0; j < len(unused); j++ {
 			if unused[j] == l {
-				grid = append(grid, l) // only append if it isnt already used
+				grid1 = append(grid1, l) // only append if it isnt already used
 				unused = append(unused[:j], unused[j+1:]...)
 			}
 		}
 	}
 	for i := 0; i < len(unused); i++ {
-		grid = append(grid, unused[i])
+		grid1 = append(grid1, unused[i])
 	}
+	unused = letters()
+	for i := 0; i < len(keyword2); i++ {
+		l := keyword2[i]
+		for j := 0; j < len(unused); j++ {
+			if unused[j] == l {
+				grid2 = append(grid2, l) // only append if it isnt already used
+				unused = append(unused[:j], unused[j+1:]...)
+			}
+		}
+	}
+	for i := 0; i < len(unused); i++ {
+		grid2 = append(grid2, unused[i])
+	}
+	grid = append(grid1, grid2...)
 	return grid
 }
 
-func gridIndex(row, column int) int {
+func gridIndexV(row, column int) int {
 	return row*5 + column
 }
 
-func rowAndColumn(grid int) (int, int) {
+func rowAndColumnV(grid int) (int, int) {
 	row := grid / 5
 	column := grid - row*5
 	return row, column
 }
 
-func decipher(text, keyword string) (deciphered string) {
-	grid := fillGrid(keyword)
+func gridIndexH(row, column int) int {
+	return row*10 + column
+}
+
+func rowAndColumnH(grid int) (int, int) {
+	row := grid / 10
+	column := grid - row*10
+	return row, column
+}
+
+func decipherVH(text, keyword1, keyword2 string) (deciphered string) {
+	grid := fillGridVH(keyword1, keyword2)
 	for i := 0; i < len(text)-1; i += 2 {
 		var idx1, idx2 int
-		for j := 0; j < len(grid); j++ {
+		for j := 0; j < len(grid)/2; j++ {
 			if text[i] == grid[j] {
 				idx1 = j
-			} else if text[i+1] == grid[j] {
-				idx2 = j
 			}
 		}
-		row1, column1 := rowAndColumn(idx1)
-		row2, column2 := rowAndColumn(idx2)
+		for k := len(grid) / 2; k < len(grid); k++ {
+			if text[i+1] == grid[k] {
+				idx2 = k
+			}
+		}
+		if idx1 == idx2 {
+			panic("Indexes are the same")
+		}
+		row1, column1 := rowAndColumnV(idx1)
+		row2, column2 := rowAndColumnV(idx2)
 
 		var dRow1, dColumn1, dRow2, dColumn2 int
 
 		if row1 == row2 && column1 == column2 {
-			fmt.Println(i)
-			fmt.Println(string(text[len(deciphered)]), string(text[len(deciphered)+1]))
-			panic("Two letters on same grid square")
+			panic("Row and Column are the same")
 		} else if row1 == row2 {
 			dRow1 = row1
 			dRow2 = row2
@@ -148,8 +173,8 @@ func decipher(text, keyword string) (deciphered string) {
 			dColumn2 = column1
 		}
 
-		letter1 := grid[gridIndex(dRow1, dColumn1)]
-		letter2 := grid[gridIndex(dRow2, dColumn2)]
+		letter1 := grid[gridIndexV(dRow1, dColumn1)]
+		letter2 := grid[gridIndexV(dRow2, dColumn2)]
 		deciphered += string(letter1)
 		deciphered += string(letter2)
 
@@ -158,13 +183,16 @@ func decipher(text, keyword string) (deciphered string) {
 }
 
 func dictionaryAttack(ciphertext string) {
-	dict := scanDict()
+	dict := scanDict()[:1000]
 	referenceScore := score(genReference(len(ciphertext)))
 	for i := 0; i < len(dict); i++ {
-		p := decipher(ciphertext, dict[i])
-		s := score(p)
-		if 10*s >= referenceScore*8 {
-			fmt.Println(p)
+		fmt.Println(i)
+		for j := 0; j < len(dict); j++ {
+			p := decipherVH(ciphertext, dict[i], dict[j])
+			s := score(p)
+			if 10*s >= referenceScore*8 {
+				fmt.Println(p)
+			}
 		}
 	}
 }
@@ -172,7 +200,6 @@ func dictionaryAttack(ciphertext string) {
 func main() {
 	original, err := os.ReadFile("ciphertext.txt")
 	check(err)
-
 	ciphertext := format(original)
 	dictionaryAttack(ciphertext)
 }
