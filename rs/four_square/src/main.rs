@@ -224,7 +224,7 @@ fn acceptance_probability(delta_e: f64, temp: f64) -> f64 {
     delta_e * temp
 }
 
-fn simulated_annealing(ciphertext: &Vec<u8>, max_constant: i32, max_temp: f64, k: f64) {
+fn simulated_annealing(ciphertext: &Vec<u8>, max_constant: i32, max_temp: f64, k: f64) -> String {
     let mut iterations_count = 0;
     let mut temp = max_temp;
     let tetragrams: HashMap<Vec<u8>, i32> = scan_tetragrams();
@@ -259,16 +259,28 @@ fn simulated_annealing(ciphertext: &Vec<u8>, max_constant: i32, max_temp: f64, k
         }
         temp *= k;
     }
-    println!(
-        "{}",
-        String::from_utf8(decipher(ciphertext, new_key).unwrap()).unwrap()
-    );
-    println!("{} iterations", iterations_count)
+    String::from_utf8(decipher(ciphertext, new_key).unwrap()).unwrap()
+}
+
+fn renneal(ciphertext: &Vec<u8>, max_constant: i32, max_temp: f64, k: f64) -> String {
+    //simulated annealing until the same solution is reached twice - runtime pretty long but should
+    //be basically always correct
+    let done: bool = false;
+    let mut solutions: HashSet<String> = HashSet::new();
+    loop {
+        let res: String = simulated_annealing(ciphertext, max_constant, max_temp, k);
+        if solutions.contains(&res) {
+            //repeated solution is very likely to be correct
+            return res;
+        }
+        solutions.insert(res);
+        println!("{}", solutions.len());
+    }
 }
 
 fn main() {
     let original = read("src/ciphertext.txt");
     let ciphertext: Vec<u8> = format_text(original);
-    simulated_annealing(&ciphertext, 1000, 1.0, 0.95);
+    println!("{}", renneal(&ciphertext, 1000, 1.0, 0.95));
     //dictionary_attack(&ciphertext);
 }
