@@ -8,7 +8,7 @@ Code I've used to solve problems from the British National Cipher Challenge. Fee
 | Bifid decoder (Go)                  | implements dictionary attack                                                                                                                                                                                                                   |
 | Columnar Transposition decoder (Go) | Decodes text based on trying all permutations up to a certain key size. Also contains facility for rotations of the ciphertext.                                                                                                                |
 | Hill Cipher (Go)                    | Bruteforces all 2x2 matrices with numbers 0-10                                                                                                                                                                                                 |
-| Monoalphabetic Solvers (Go, Rust)   | implementations of hill climbing, simulated annealing, and the genetic algorithm (genetic algorithm works very rarely lol) in Go. SImulated annealing also implemented in rust                                                                 |
+| Monoalphabetic Solvers (Go, Rust)   | implementations of hill climbing, simulated annealing, and the genetic algorithm (genetic algorithm works very rarely lol) in Go. Simulated annealing also implemented in rust                                                                 |
 | Nihilist decoder (Go)               | Not really much of a decoder, but useful if the user can guess the first keyword                                                                                                                                                               |
 | Playfair decoder(Go)                | Implements dictionary attack                                                                                                                                                                                                                   |
 | Polybius decoder (Go)               | dictionary attack                                                                                                                                                                                                                              |
@@ -16,9 +16,10 @@ Code I've used to solve problems from the British National Cipher Challenge. Fee
 | Trifid decoder (Go)                 | dictionary attack                                                                                                                                                                                                                              |
 | Two-Square decoder (Go)             | dictionary attack. only applies to two-square cipher where the squares are placed vertically on top of each other and filled horizontally.                                                                                                     |
 | Vigenere Decoder (Go)               | uses statistical attack. It will crash if there are no spikes in IOC, indicating that Vigenere was almost certainly not used.                                                                                                                  |
+| Caesar Cipher decoder (Rust)        | bruteforces all shifts from 0-26                                 |
 | Four Square decoder (Rust)          | implements both a dictionary attack and simulated annealing with rennealing. The simulated annealing with rennealing is very consistent but its runtime is between 30-60 secs.                                                                 |
 
-| Caesar Cipher decoder (Rust)        | bruteforces all posisble shifts                                  |
+
 
 
 # Usage: 
