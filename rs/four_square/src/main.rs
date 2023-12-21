@@ -26,6 +26,11 @@ struct Coords {
     column: i32,
 }
 
+struct Solution {
+    plaintext: String,
+    key: Key,
+}
+
 const LETTERS: [u8; 25] = [
     65, 66, 67, 68, 69, 70, 71, 72, 73, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
     90,
@@ -224,7 +229,7 @@ fn acceptance_probability(delta_e: f64, temp: f64) -> f64 {
     delta_e * temp
 }
 
-fn simulated_annealing(ciphertext: &Vec<u8>, max_constant: i32, max_temp: f64, k: f64) -> String {
+fn simulated_annealing(ciphertext: &Vec<u8>, max_constant: i32, max_temp: f64, k: f64) -> Solution {
     let mut iterations_count = 0;
     let mut temp = max_temp;
     let tetragrams: HashMap<Vec<u8>, i32> = scan_tetragrams();
@@ -259,21 +264,26 @@ fn simulated_annealing(ciphertext: &Vec<u8>, max_constant: i32, max_temp: f64, k
         }
         temp *= k;
     }
-    String::from_utf8(decipher(ciphertext, new_key).unwrap()).unwrap()
+    Solution {
+        plaintext: String::from_utf8(decipher(ciphertext, new_key).unwrap()).unwrap(),
+        key: new_key,
+    }
 }
 
 fn renneal(ciphertext: &Vec<u8>, max_constant: i32, max_temp: f64, k: f64) -> String {
     //simulated annealing until the same solution is reached twice - runtime pretty long but should
     //be basically always correct
-    let done: bool = false;
     let mut solutions: HashSet<String> = HashSet::new();
     loop {
-        let res: String = simulated_annealing(ciphertext, max_constant, max_temp, k);
-        if solutions.contains(&res) {
+        let res: Solution = simulated_annealing(ciphertext, max_constant, max_temp, k);
+        let p: String = res.plaintext;
+        if solutions.contains(&p) {
             //repeated solution is very likely to be correct
-            return res;
+            println!("Key 1: {}", String::from_utf8(res.key.b.to_vec()).unwrap());
+            println!("Key 2: {}", String::from_utf8(res.key.c.to_vec()).unwrap());
+            return p;
         }
-        solutions.insert(res);
+        solutions.insert(p);
         println!("{}", solutions.len());
     }
 }
