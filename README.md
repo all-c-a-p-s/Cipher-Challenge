@@ -18,6 +18,8 @@ Code I've used to solve problems from the British National Cipher Challenge. Fee
 | Vigenere Decoder (Go)               | uses statistical attack. It will crash if there are no spikes in IOC, indicating that Vigenere was almost certainly not used.                                                                                                                  |
 | Four Square decoder (Rust)          | implements both a dictionary attack and simulated annealing with rennealing. The simulated annealing with rennealing is very consistent but its runtime is between 30-60 secs.                                                                 |
 
+| Caesar Cipher decoder (Rust)        | bruteforces all posisble shifts                                  |
+
 
 # Usage: 
 To use any of the tools, paste the ciphertext into the ```ciphertext.txt``` file, and run the corresponding source file.
