@@ -1,7 +1,7 @@
 # Cipher Challenge
 Code I've used to solve problems from the British National Cipher Challenge. Feel free to use to solve the various ciphers included:
 
-| solver                              | description                                                                                                                                                                                                                                    |
+| Solver                              | Description                                                                                                                                                                                                                                    |
 |-------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Analysis tool (Go)                  | preforms analysis of ciphertext, giving number of unique letters, letter frequency distribution, and the likelihood that some form of substitution was used. It also has the facility to analyse the frequencies of n-grams in the ciphertext. |
 | Baudot decoder (Go)                 | decodes ciphertext with baudot code, with the facility of trying transposition permutations until a valid string of baudot codes is found.                                                                                                     |
