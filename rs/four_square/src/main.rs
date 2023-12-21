@@ -277,6 +277,7 @@ fn renneal(ciphertext: &Vec<u8>, max_constant: i32, max_temp: f64, k: f64) -> St
     loop {
         let res: Solution = simulated_annealing(ciphertext, max_constant, max_temp, k);
         let p: String = res.plaintext;
+        println!("{}", p);
         if solutions.contains(&p) {
             //repeated solution is very likely to be correct
             println!("Key 1: {}", String::from_utf8(res.key.b.to_vec()).unwrap());
@@ -288,9 +289,23 @@ fn renneal(ciphertext: &Vec<u8>, max_constant: i32, max_temp: f64, k: f64) -> St
     }
 }
 
+fn reference_annealing(ciphertext: &Vec<u8>, max_constant: i32, max_temp: f64, k: f64) -> String {
+    let tetragrams = scan_tetragrams();
+    let ref_score = score(&gen_reference(ciphertext.len()), &tetragrams);
+    loop {
+        let res: Solution = simulated_annealing(ciphertext, max_constant, max_temp, k);
+        let p: String = res.plaintext;
+        if score(&p.as_bytes().to_vec(), &tetragrams) * 10 >= ref_score * 8 {
+            println!("Key 1: {}", String::from_utf8(res.key.b.to_vec()).unwrap());
+            println!("Key 2: {}", String::from_utf8(res.key.c.to_vec()).unwrap());
+            return p;
+        }
+    }
+}
+
 fn main() {
     let original = read("src/ciphertext.txt");
     let ciphertext: Vec<u8> = format_text(original);
-    println!("{}", renneal(&ciphertext, 1000, 1.0, 0.95));
+    println!("{}", reference_annealing(&ciphertext, 1000, 1.0, 0.95));
     //dictionary_attack(&ciphertext);
 }
