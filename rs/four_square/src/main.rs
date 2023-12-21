@@ -242,8 +242,8 @@ fn simulated_annealing(ciphertext: &Vec<u8>, max_constant: i32, max_temp: f64, k
         let s_old: f64 = 1.0;
         let s_new: f64 = score(&decipher(ciphertext, new_key).unwrap(), &tetragrams) as f64
             / score(&decipher(ciphertext, old_key).unwrap(), &tetragrams) as f64;
-        let delta_e: f64 = s_new / s_old;
-        if delta_e < 1.0 {
+        let delta_e: f64 = s_old / s_new;
+        if delta_e > 1.0 {
             //old key is better
             let mut rng = rand::thread_rng();
             let x: f64 = rng.gen();
