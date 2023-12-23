@@ -97,7 +97,7 @@ fn mutate(k: [u8; 26]) -> [u8; 26] {
 }
 
 fn acceptance_probability(delta_e: f32, temp: f32) -> f32 {
-    delta_e * temp
+    (1.0 / delta_e) * temp
 }
 
 fn simulated_annealing(ciphertext: &Vec<u8>, max_constant: i32, max_temp: f32, k: f32) -> String {
