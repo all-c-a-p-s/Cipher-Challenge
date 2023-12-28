@@ -17,7 +17,7 @@ Code I've used to solve problems from the British National Cipher Challenge. Fee
 | Two-Square decoder (Go)             | dictionary attack. only applies to two-square cipher where the squares are placed vertically on top of each other and filled horizontally.                                                                                                     |
 | Vigenere Decoder (Go)               | uses statistical attack. It will crash if there are no spikes in IOC, indicating that Vigenere was almost certainly not used.                                                                                                                  |
 | Caesar Cipher decoder (Rust)        | bruteforces all shifts from 0-26                                 |
-| Four Square decoder (Rust)          | implements both a dictionary attack and simulated annealing with rennealing/reference score based on English sample text generated of same length. The simulated annealing with rennealing is very consistent but its runtime is between 30-60 secs.     |
+| Four Square decoder (Go, Rust)      | implements both a dictionary attack and simulated annealing with rennealing/reference score based on English sample text generated of same length. The simulated annealing with rennealing is very consistent but its runtime is between 30-60 secs. Genetic Algorithm implemented in Go  |
 
 
 
