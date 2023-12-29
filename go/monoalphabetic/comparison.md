@@ -9,7 +9,7 @@ I used three plaintexts to compare the monoalphabetic solvers. Each of these wer
 I used the file randomGenerator/randomCiphertext.go to randomly generate keys to encipher these ciphertexts with random keys
 I also added an iteration limit of 10000 iterations to the simulated annealing script because otherwise it would run indefinitely for the 25 word text.
 
-Results:
+# Results:
 | Test                | Simulated Annealing | Genetic Algorithm |
 | ----------------- | ------------------- | ----------------- |
 | Cicero 100 (1)                     |  ✅ 5.76                                |  ✅ 5.76                            |
