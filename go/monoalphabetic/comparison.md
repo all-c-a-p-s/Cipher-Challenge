@@ -1,6 +1,6 @@
 # Testing Simulated Annealing Versus the Genetic Algorithm
 
-I used three plaintexts to compare the monoalphabetic solvers. Each of these were generated using the website [blindtextgenerator.com]:
+I used three plaintexts to compare the monoalphabetic solvers. Each of these were generated using the website (blindtextgenerator.com)[blindtextgenerator.com]:
 - Cicero(en) - 100 words
 - Li Europan Lingues (en) - 50 words
 - Kafka - 25 words
