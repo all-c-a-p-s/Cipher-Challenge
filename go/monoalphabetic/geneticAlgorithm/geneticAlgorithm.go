@@ -128,6 +128,8 @@ func geneticAlgorithm(maxGens, genSize, k int, ciphertext string) string {
 		population = population[len(population)-genSize-1:]
 	}
 
+	fmt.Print("Final Score: ")
+	fmt.Println(score(encipher(population[len(population)-1].key, ciphertext)))
 	return string(encipher(population[len(population)-1].key, ciphertext))
 }
 

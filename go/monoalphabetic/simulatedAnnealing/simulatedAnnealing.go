@@ -14,7 +14,7 @@ import (
 
 type key struct {
 	k     [26]byte
-	score int
+	score float64
 }
 
 func check(err error) {
@@ -33,11 +33,11 @@ func format(original []byte) (ciphertext string) {
 }
 
 // !const
-var tg map[string]int = tetragrams() // used instead of initialiser function so the massive file is only read once
+var tg map[string]float64 = tetragrams() // used instead of initialiser function so the massive file is only read once
 
-func tetragrams() map[string]int {
-	tetragrams := map[string]int{}
-	text, err := os.ReadFile("../tetragrams.txt")
+func tetragrams() map[string]float64 {
+	tetragrams := map[string]float64{}
+	text, err := os.ReadFile("../../logTetragrams.txt")
 	check(err)
 
 	scanner := bufio.NewScanner(strings.NewReader(string(text)))
@@ -45,7 +45,7 @@ func tetragrams() map[string]int {
 	for scanner.Scan() {
 		fields := strings.Split(scanner.Text(), ", ")
 		tetragram := fields[0]
-		frequency, err := strconv.Atoi(fields[1])
+		frequency, err := strconv.ParseFloat(fields[1], 64)
 		check(err)
 
 		tetragrams[tetragram] = frequency
@@ -53,11 +53,12 @@ func tetragrams() map[string]int {
 	return tetragrams
 }
 
-func encipher(key [26]byte, plaintext string) (ciphertext string) {
+func encipher(key [26]byte, plaintext string) (ciphertext []byte) {
+	// also used as deciphering function with inverse key
 	for i := 0; i < len(plaintext); i++ {
-		for j := 0; j < 26; j++ {
+		for j := 0; j < len(letters()); j++ {
 			if letters()[j] == plaintext[i] {
-				ciphertext += string(key[j])
+				ciphertext = append(ciphertext, key[j])
 			}
 		}
 	}
@@ -68,13 +69,23 @@ func letters() [26]byte {
 	return [26]byte{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
 }
 
-func score(text string) (score int) {
+func score(text []byte) (score float64) {
+	textTGs := map[string]float64{}
 	for i := 0; i < len(text)-4; i++ {
-		slice := text[i : i+4]
-		if val, ok := tg[slice]; ok {
-			score += val // texts containing more common tetragrams are more likely to be English
+		slice := string(text[i : i+4])
+		if _, ok := textTGs[slice]; ok {
+			textTGs[slice]++ // texts containing more common tetragrams are more likely to be English
+		} else {
+			textTGs[slice] = 1.0
 		}
 	}
+
+	for key, val := range textTGs {
+		if _, ok := tg[key]; ok {
+			score += val * tg[key]
+		}
+	}
+	score /= float64((len(text) - 3)) // divide by number of tetragrams
 	return score
 }
 
@@ -101,11 +112,15 @@ func acceptanceProbability(dE, temp float64) float64 {
 	return dE * temp
 }
 
-func simulatedAnnealing(maxConstant int, maxTemp int, ciphertext string, k float64) {
+func simulatedAnnealing(maxConstant int, maxTemp int, iterationLimit int, ciphertext string, k float64) {
 	alpha := key{randomise(), 0}
 	constant := 0
 	temp := float64(maxTemp)
+	totalIterations := 0
 	for constant < maxConstant {
+		if totalIterations >= iterationLimit {
+			break
+		}
 		n := mutate(alpha.k)
 
 		p1 := encipher(alpha.k, ciphertext)
@@ -130,13 +145,16 @@ func simulatedAnnealing(maxConstant int, maxTemp int, ciphertext string, k float
 			}
 		}
 		temp *= k
+		totalIterations++
 	}
-	fmt.Println(encipher(alpha.k, ciphertext))
+	fmt.Println(string(encipher(alpha.k, ciphertext)))
+	fmt.Print("Final Score: ")
+	fmt.Println(score(encipher(alpha.k, ciphertext)))
 }
 
 func main() {
 	original, err := os.ReadFile("ciphertext.txt")
 	check(err)
 	ciphertext := format(original)
-	simulatedAnnealing(500, 1, ciphertext, 0.95)
+	simulatedAnnealing(500, 1, 10000, ciphertext, 0.95)
 }
