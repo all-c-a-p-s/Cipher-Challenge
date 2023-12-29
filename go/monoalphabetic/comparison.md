@@ -29,6 +29,8 @@ I also added an iteration limit of 10000 iterations to the simulated annealing s
 | Kafka 25 (5)                       | ❌ 4.00                                 | ❌ 4.01                             |
 | Mean Score:                        | 4.50                                   | 5.09                               |
 
+# Conclusion
+
 Overall, the genetic algorithm was much more consistent:
 - It found a fully correct solution 10 times compared to 5
 - It had a higher mean fitness score for its solution
